@@ -15,14 +15,20 @@ import java.util.Random;
 public class Population {
     int popSize;
     ArrayList<Tree> pop;
-    
-    Population(int n, ArrayList<Tree> p){
+    ArrayList<Node> leaves;
+    Population(int n, ArrayList<Tree> p, Species s[]){
         popSize=n;
         pop=p;
+        leaves= new ArrayList<Node>();
+        for(int i=0;i<s.length;i++)
+            leaves.add(new Node(s[i],i));
     }
-    Population(int n){
+    Population(int n, Species s[]){
         popSize=n;
         pop= new ArrayList<Tree>();
+        leaves= new ArrayList<Node>();
+        for(int i=0;i<s.length;i++)
+            leaves.add(new Node(s[i],i));
     }
     
     void RandomPopulation(){
@@ -39,24 +45,24 @@ public class Population {
     Tree GenRandomIndividual(){
         Tree t;
         Random rn= new Random();
-        ArrayList<Node> ind= new ArrayList<Node>();
-        ArrayList<Node> spcs= new ArrayList<Node>();
-        for(int i=0;i<Phylo.noOfSpecies;i++){
-            spcs.add(new Node(Phylo.s[i], new String("L"+i)));
-        }
+        ArrayList<Node> ind= new ArrayList<Node>(leaves);
+        ArrayList<Node> spcs= new ArrayList<Node>(leaves);
+        
         int count=0;
         while(spcs.size()>1){
-            Node newInt= new Node(null,new String("I"+count));
+            Node newInt= new Node(null,Phylo.noOfSpecies+count);
             count++;
             for(int i=0;i<2;i++){
                 int index= rn.nextInt(spcs.size());
                 Node removed=spcs.remove(index);
-                removed.parent=newInt;
-                newInt.child[i]=removed;
                 if(removed.spc!=null)
-                    ind.add(0, removed);
-                else
+                {    ind.get(removed.label).parent=newInt;
+                    newInt.child[i]=ind.get(removed.label); 
+                }else{
+                    removed.parent=newInt;
+                    newInt.child[i]=removed;
                     ind.add(removed);  
+                }
             }
             spcs.add(newInt);
         //    System.out.println(count+ " " + spcs.size());
@@ -69,10 +75,19 @@ public class Population {
     }
     
     void print(){
+       
         for(int i=0; i< popSize;i++){
+            pop.get(i).print();
             pop.get(i).printTree(pop.get(i).root,0);
             System.out.println();
         }
+    }
+    
+    ArrayList<ArrayList<Node>> CrossOver()
+    {
+    	ArrayList<ArrayList<Node>> C=new ArrayList<ArrayList<Node>>();
+    	
+    	return C;
     }
     
     

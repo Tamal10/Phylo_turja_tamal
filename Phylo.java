@@ -3,7 +3,8 @@
  * and open the template in the editor.
  */
 package phylo;
-
+import java.util.ArrayList;
+import java.lang.Math;
 /**
  *
  * @author TAMAL
@@ -15,10 +16,18 @@ public class Phylo {
      */
     
     static int noOfSpecies;
+    static int seqLen=8;
     static Species s[];
     Phylo(int n, Species s[]){
         noOfSpecies=n;
-        this.s=s;
+        Phylo.s=s;
+    }
+    
+    ArrayList<Node> genLeafNodes(Species s[]){
+        ArrayList<Node> leaves= new ArrayList<Node>();
+        for(int i=0;i<s.length;i++)
+            leaves.add(new Node(s[i],i));
+        return leaves;
     }
     
     public static void main(String[] args) {
@@ -29,8 +38,10 @@ public class Phylo {
         s[1]= new Species("bat","AATCGACT");
         s[2]= new Species("man","CTAAGTGT");
         s[3]= new Species("spider","TAGAGTAT");
-        Population p= new Population(3);
+        Population p= new Population(3,s);
         p.RandomPopulation();
+        //Tree t=p.pop.get(0);
+        //t.HillClimb(3);
         p.print();
     }
 }

@@ -5,6 +5,8 @@
 package phylo;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 
 /**
  *
@@ -13,12 +15,13 @@ import java.util.ArrayList;
 public class Tree {
     ArrayList <Node> T;
     Node root;
-    
+    int Score;
     Tree(Tree Tr){
         this.T=Tr.T;
     }
     Tree(ArrayList<Node> T){
         this.T=T;
+        //root=T.get(T.size()-1);
     }
     
     void print(Node c){
@@ -36,11 +39,66 @@ public class Tree {
         for(int i=0;i<T.size();i++){
             T.get(i).print();
         }
+         System.out.println("");
     }
-    public void ParsimonizeTree()
+    public void SmallTweak()
+    {
+    	//printTree(root,0);
+    	int leaf_count=(T.size()+1)/2;
+    	Random r=new Random();
+		//choosing two random indices of leaves
+		int l1=r.nextInt(leaf_count);
+		int l2=r.nextInt(leaf_count);
+		
+		while(T.get(l1).parent==T.get(l2).parent)
+		{
+			l2=r.nextInt(leaf_count);
+		}
+		//leaves found and now we have to swap them
+    	Node leaf1=T.get(l1);
+    	Node leaf2=T.get(l2);
+    	Node p1=leaf1.parent;
+    	Node p2=leaf2.parent;
+    	
+    	System.out.println("Swapping "+leaf1.label+" and "+leaf2.label);
+    	leaf1.parent=p2;
+    	leaf2.parent=p1;
+    	if(p1.child[0]==leaf1)
+    		p1.child[0]=leaf2;
+    	else p1.child[1]=leaf2;
+    	
+    	if(p2.child[0]==leaf2)
+    		p2.child[0]=leaf1;
+    	else p2.child[1]=leaf1;
+    	System.out.println();
+    	//printTree(root,0);
+    		
+    }
+    public void HillClimb(int iteration)
+    {
+    	
+    	Tree current=this;
+    	Tree copyTree=current.getCopy();
+    	current.ParsimonizeTree();
+    	while(iteration-->0)
+    	{
+    		copyTree.SmallTweak();
+    		copyTree.ParsimonizeTree();
+    		
+    		if(current.Score>copyTree.Score){
+
+    			System.out.println(current.Score+" "+copyTree.Score);
+    			current=copyTree.getCopy();
+    			//printTree(current.T.get(current.T.size()-1),0);
+    			}
+    	}
+    	this.T=current.T;
+    	//printTree(T.get(T.size()-1),0);
+    }
+    public int ParsimonizeTree()
 	{
 		
-		for(int i=0;i<8;i++)
+		for(int i=0;i<Phylo.seqLen;i++)
 		{
 			//for each site
 			PostOrder(root,i);
@@ -75,10 +133,12 @@ public class Tree {
 
 			
 		}
-		System.out.println("Score:"+root.finalScore);
+		Score=root.finalScore;
+		return root.finalScore;
+		//System.out.println("Score:"+root.finalScore);
 		//System.out.println("after that");
 	}
-	public void PreOrder(Node root,int site)
+	private void PreOrder(Node root,int site)
 	{
 		int count=1;
 		if(root.parent!=null)
@@ -98,7 +158,7 @@ public class Tree {
 		if(root.child[0]!=null)PreOrder(root.child[0],site);
 		if(root.child[1]!=null)PreOrder(root.child[1],site);
 	}
-	public int PostOrder(Node root,int site)
+	private int PostOrder(Node root,int site)
 	{
 		if(root.child[0]==null && root.child[1]==null)
 		{
@@ -141,7 +201,7 @@ public class Tree {
 	}
 	public void printTree(Node root,int depth)
 	{
-		System.out.println(root.spc.seq);
+		System.out.println(root.label);
 		
 		if(root.child[0]!=null){
 			for(int i=0;i<depth*5;i++)System.out.print(" ");
@@ -156,6 +216,29 @@ public class Tree {
 			printTree(root.child[1],depth+1);
 		
 		}
+	}
+	public Tree getCopy()
+	{
+		Tree B=new Tree(new ArrayList<Node>());
+		int i;
+		for(i=0;T.get(i).child[0]==null && T.get(i).child[1]==null;i++)
+		{
+			Node t=new Node(T.get(i).spc,T.get(i).label);
+			B.T.add(t);
+		}
+		for(;i<T.size();i++)
+		{
+			Node t=new Node(T.get(i).spc,T.get(i).label);
+			t.child[0]=B.T.get(T.indexOf(T.get(i).child[0]));
+			t.child[1]=B.T.get(T.indexOf(T.get(i).child[1]));
+			B.T.add(t);
+		}
+		for(i=0;i<T.size()-1;i++)
+		{
+			B.T.get(i).parent=B.T.get(T.indexOf(T.get(i).parent));
+		}
+		B.root=B.T.get(B.T.size()-1);
+		return B;
 	}
 	
 }

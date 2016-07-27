@@ -19,7 +19,7 @@ public class Species {
     Species()
     {
     	speciesName="";
-    	seq=new char[8];
+    	seq=new char[Phylo.seqLen];
     }
     void PrintSpecies(){
         System.out.println(speciesName +" " + new String(seq));

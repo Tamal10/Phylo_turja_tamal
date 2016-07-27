@@ -39,6 +39,7 @@ public class Tree {
         for(int i=0;i<T.size();i++){
             T.get(i).print();
         }
+         System.out.println("");
     }
     public void SmallTweak()
     {

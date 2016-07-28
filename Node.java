@@ -29,6 +29,18 @@ public class Node {
         child[1]=null;
     }
     
+	Node(Node n){
+        label=n.label;
+        spc=n.spc;
+        height=n.height;
+        score=n.score;
+        finalScore=n.finalScore;
+        child[0]=null;
+        child[1]=null;
+        parent=null;
+    }
+    
+	
     void print(){
         System.out.print(label);
 //        if(child[0]!=null)
